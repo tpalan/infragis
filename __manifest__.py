@@ -12,6 +12,8 @@
     'version': '0.1',
     'depends': ['base', 'p3base'],
     'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
         'views/views.xml'
     ],
 }

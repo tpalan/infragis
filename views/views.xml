@@ -34,4 +34,98 @@
             </xpath>
         </field>
     </record>
+
+    <record model="ir.ui.view" id="view_infragis_index_form">
+        <field name="name">infragis.index.form</field>
+        <field name="model">assessment.index</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Index-Eintrag">
+                <sheet name="Projekt">
+                    <group>
+                        <group>
+                            <field name="year"/>
+                            <field name="value"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_infragis_index_tree">
+        <field name="name">Indexeinträge</field>
+        <field name="model">assessment.index</field>
+        <field name="arch" type="xml">
+            <tree string="Indexeinträge">
+                <field name="year"/>
+                <field name="value"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_infragis_index_window">
+        <field name="name">Indexeinträge</field>
+        <field name="res_model">assessment.index</field>
+        <field name="view_mode">tree,form</field>
+        <!-- <field name="search_view_id" ref="view_hostadmin_domain_filter"/>-->
+    </record>
+
+    <record model="ir.ui.view" id="view_infragis_project_form">
+        <field name="name">infragis.project.form</field>
+        <field name="model">infragis.project</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Projekt">
+                <sheet name="Projekt">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="end_customer_id"/>
+                            <field name="alt_customer_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_infragis_project_tree">
+        <field name="name">infragis.project.tree</field>
+        <field name="model">infragis.project</field>
+        <field name="arch" type="xml">
+            <tree string="Projekte">
+                <field name="name"/>
+                <field name="end_customer_id"/>
+                <field name="customer_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_infragis_project_filter" model="ir.ui.view">
+        <field name="name">infragis.project.search</field>
+        <field name="model">infragis.project</field>
+        <field name="arch" type="xml">
+            <search string="Projektsuche">
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_infragis_project_window">
+        <field name="name">Projekte</field>
+        <field name="res_model">infragis.project</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_infragis_project_filter"/>
+    </record>
+
+
+    <!-- Top menu item -->
+    <menuitem name="InfraGIS" id="menu_infragis" sequence="40"/>
+
+    <menuitem name="Projekte" id="menu_infragis_projects" parent="menu_infragis"
+              action="action_infragis_project_window"/>
+
+    <menuitem name="Index" id="menu_infragis_index" parent="menu_infragis"
+              action="action_infragis_index_window"/>
 </odoo>

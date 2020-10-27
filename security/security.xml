@@ -1,0 +1,5 @@
+<odoo>
+    <record id="infragis_admins" model="res.groups">
+        <field name="name">IGIS Projektverwalter</field>
+    </record>
+</odoo>

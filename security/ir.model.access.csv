@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_infragis_infragis,infragis.infragis,model_infragis_infragis,,1,0,0,0
+access_infragis_index_all,assessment.index all,model_assessment_index,,1,0,0,0
+access_infragis_index,assessment.index,model_assessment_index,infragis_admins,1,1,1,1
+access_infragis_project_all,infragis.project all,model_infragis_project,,1,0,0,0
+access_infragis_project,infragis.project,model_infragis_project,infragis_admins,1,1,1,1
