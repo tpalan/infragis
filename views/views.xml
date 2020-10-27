@@ -80,9 +80,10 @@
                 <sheet name="Projekt">
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="end_customer_id"/>
+                            <field name="partner_id"/>
                             <field name="alt_customer_id"/>
+                            <field name="introduction_date"/>
+                            <field name="initial_invoice_id"/>
                         </group>
                     </group>
                 </sheet>
@@ -95,8 +96,7 @@
         <field name="model">infragis.project</field>
         <field name="arch" type="xml">
             <tree string="Projekte">
-                <field name="name"/>
-                <field name="end_customer_id"/>
+                <field name="partner_id"/>
                 <field name="customer_id"/>
             </tree>
         </field>
@@ -107,7 +107,11 @@
         <field name="model">infragis.project</field>
         <field name="arch" type="xml">
             <search string="Projektsuche">
-                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="customer_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_customer_id" string="Re-Empfänger" context="{'group_by':'customer_id'}"/>
+                </group>
             </search>
         </field>
     </record>
