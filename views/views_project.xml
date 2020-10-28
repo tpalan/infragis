@@ -1,0 +1,65 @@
+<odoo>
+
+    <record model="ir.ui.view" id="view_infragis_project_form">
+        <field name="name">infragis.project.form</field>
+        <field name="model">infragis.project</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Projekt">
+                <sheet name="Projekt">
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="introduction_date"/>
+                        </group>
+                        <group>
+                            <field name="initial_invoice_id"/>
+                            <field name="recurring_invoice_start_date"/>
+                            <field name="sale_order_id"/>
+                            <field name="assessment_index_id"/>
+                        </group>
+                    </group>
+                    <label for="sale_order_line_ids" string="Monatliche Gebühren"/>
+                    <field name="sale_order_line_ids" widget="many2many">
+                        <tree string="Monatliche Gebühren">
+                            <field name="name"/>
+                            <field name="price_subtotal"/>
+                        </tree>
+                    </field>
+                    <label for="invoices" string="Rechnungen"/>
+                    <field name="invoices" widget="many2many">
+                        <tree string="Rechnungen">
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_infragis_project_tree">
+        <field name="name">infragis.project.tree</field>
+        <field name="model">infragis.project</field>
+        <field name="arch" type="xml">
+            <tree string="Projekte">
+                <field name="partner_id"/>
+                <!-- <field name="customer_id"/> -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_infragis_project_filter" model="ir.ui.view">
+        <field name="name">infragis.project.search</field>
+        <field name="model">infragis.project</field>
+        <field name="arch" type="xml">
+            <search string="Projektsuche">
+                <field name="partner_id"/>
+                <!-- <field name="customer_id"/> -->
+                <!-- <group expand="0" string="Group By">
+                    <filter name="group_by_customer_id" string="Re-Empfänger" context="{'group_by':'customer_id'}"/>
+                </group> -->
+            </search>
+        </field>
+    </record>
+
+</odoo>

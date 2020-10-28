@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_infragis_index_form">
+        <field name="name">infragis.index.form</field>
+        <field name="model">assessment.index</field>
+        <field name="priority" eval="16"/>
+        <field name="arch" type="xml">
+            <form string="Index-Eintrag">
+                <sheet name="Projekt">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="value"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_infragis_index_tree">
+        <field name="name">Indexeinträge</field>
+        <field name="model">assessment.index</field>
+        <field name="arch" type="xml">
+            <tree string="Indexeinträge">
+                <field name="name"/>
+                <field name="value"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

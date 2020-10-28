@@ -5,7 +5,7 @@ class AssessmentIndex(models.Model):
     _name = 'assessment.index'
     _description = 'Index'
 
-    year = fields.Integer('Jahr', required=True) # TODO: format without thousand seperator
+    name = fields.Integer('Jahr', required=True) # TODO: format without thousand seperator
     currency_id = fields.Many2one('res.currency', string="Currency", compute='_get_default_currency',
                                   help='Utility field to express amount currency', store=True, readonly=True)
     value = fields.Monetary('Wert', currency_field='currency_id', required=True)
