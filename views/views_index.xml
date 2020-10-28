@@ -11,6 +11,7 @@
                         <group>
                             <field name="name"/>
                             <field name="value"/>
+                            <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
                 </sheet>
@@ -25,6 +26,7 @@
             <tree string="Indexeinträge">
                 <field name="name"/>
                 <field name="value"/>
+                <field name="currency_id" invisible="1"/>
             </tree>
         </field>
     </record>

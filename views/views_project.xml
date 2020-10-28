@@ -11,28 +11,55 @@
                         <group>
                             <field name="partner_id"/>
                             <field name="introduction_date"/>
+                            <field name="price_sum_total"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="commission_partner_id"/>
                         </group>
                         <group>
-                            <field name="initial_invoice_id"/>
+                            <field name="sale_order_sent_date"/>
+                            <field name="sale_order_accepted_date"/>
                             <field name="recurring_invoice_start_date"/>
-                            <field name="sale_order_id"/>
-                            <field name="assessment_index_id"/>
                         </group>
                     </group>
-                    <label for="sale_order_line_ids" string="Monatliche Gebühren"/>
-                    <field name="sale_order_line_ids" widget="many2many">
-                        <tree string="Monatliche Gebühren">
-                            <field name="name"/>
-                            <field name="price_subtotal"/>
-                        </tree>
-                    </field>
-                    <label for="invoices" string="Rechnungen"/>
-                    <field name="invoices" widget="many2many">
-                        <tree string="Rechnungen">
-                            <field name="name"/>
-                        </tree>
-                    </field>
+                    <group>
+                        <field name="initial_invoice_id"
+                               domain="[('type', '=', 'out_invoice'),('end_customer_id', '=', partner_id),'|',('partner_id', '=', partner_id)]"/>
+                        <field name="sale_order_id" domain="[('partner_id', '=', partner_id)]"/>
+                        <field name="assessment_index_id"/>
+                    </group>
+                    <separator/>
+                    <notebook>
+                        <page string="Monatliche Gebühren">
+                            <field name="sale_order_line_ids" widget="many2many">
+                                <tree string="Monatliche Gebühren">
+                                    <field name="name"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount"/>
+                                    <field name="price_subtotal"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Rechnungen">
+                            <field name="invoices" widget="many2many">
+                                <tree string="Rechnungen">
+                                    <field name="name"/>
+                                    <field name="ref" optional="hide"/>
+                                    <field name="invoice_date"/>
+                                    <field name="period"/>
+                                    <field name="amount_untaxed"/>
+                                    <field name="state" optional="show" invisible="1"/>
+                                    <field name="invoice_payment_state" optional="hide"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>
@@ -43,7 +70,11 @@
         <field name="arch" type="xml">
             <tree string="Projekte">
                 <field name="partner_id"/>
-                <!-- <field name="customer_id"/> -->
+                <field name="sale_order_accepted_date"/>
+                <field name="introduction_date"/>
+                <field name="price_sum_total" sum="Total"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="commission_partner_id"/>
             </tree>
         </field>
     </record>
@@ -54,10 +85,11 @@
         <field name="arch" type="xml">
             <search string="Projektsuche">
                 <field name="partner_id"/>
-                <!-- <field name="customer_id"/> -->
-                <!-- <group expand="0" string="Group By">
-                    <filter name="group_by_customer_id" string="Re-Empfänger" context="{'group_by':'customer_id'}"/>
-                </group> -->
+                <field name="commission_partner_id"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_commissions_partner_id" string="Provisions-Empfänger"
+                            context="{'group_by':'commission_partner_id'}"/>
+                </group>
             </search>
         </field>
     </record>
