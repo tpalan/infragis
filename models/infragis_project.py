@@ -11,8 +11,7 @@ class InfragisProject(models.Model):
     _order = 'sale_order_accepted_date desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char(
-        'Bezeichnung', compute='_compute_name', store=True)
+    name = fields.Char('Bezeichnung', compute='_compute_name', store=True)
 
     partner_id = fields.Many2one('res.partner', string="Kunde", required=True)
 
@@ -26,18 +25,15 @@ class InfragisProject(models.Model):
 
     commission_partner_id = fields.Many2one('res.partner', string="Provisions-Empfänger")
 
-    sale_order_id = fields.Many2one('sale.order', string="Angebot", tracking=True)
-    sale_order_line_ids = fields.Many2many('sale.order.line', string="Gebühren", readonly=True, store=True,
-                                           compute='_compute_sale_order_lines')
+    sale_order_ids = fields.Many2many('sale.order', string="Angebot(e)", tracking=True)
+    sale_order_line_ids = fields.Many2many('sale.order.line', string="Gebühren", readonly=True, store=False,
+                                           compute='_search_sale_order_lines')
 
     currency_id = fields.Many2one('res.currency', string="Currency",
                                   default=lambda self: self.env.user.company_id.currency_id, store=True, readonly=True)
     price_sum_total = fields.Monetary(string="Aktuelle Monatsrate", readonly=True, store=True,
                                       compute='_compute_price_sum',
-                                      currency_field='currency_id')
-
-    assessment_index_id = fields.Many2one('assessment.index', string="Berechnungsgrundlage", readonly=True,
-                                          compute='_compute_assessment_index')
+                                      currency_field='currency_id', tracking=True)
 
     year = fields.Integer(string="Jahr", help="Dummy field for reacting to year changes", readonly=True,
                           default=datetime.datetime.now().year)
@@ -67,7 +63,7 @@ class InfragisProject(models.Model):
                 [('type', '=', 'out_invoice'), '|', ('end_customer_id', '=', project.partner_id.id),
                  ('partner_id', '=', project.partner_id.id)])
 
-    @api.depends('sale_order_line_ids', 'assessment_index_id', 'sale_order_line_ids.price_total', 'year')
+    @api.depends('sale_order_line_ids', 'year')
     def _compute_price_sum(self):
         # get index for current year
         # get current year
@@ -76,26 +72,15 @@ class InfragisProject(models.Model):
         for project in self:
             # get our current index
             project.price_sum_total = 0
-            if not project.assessment_index_id:  # we need the original index
-                continue
-            old_index_value = project.assessment_index_id.value
-
             for line in project.sale_order_line_ids:
+                sale_order = line.order_id
+                old_index_value = sale_order.assessment_index_id.value
                 project.price_sum_total += line.price_subtotal / old_index_value * cur_index.value
 
-    @api.depends('sale_order_id')
-    def _compute_sale_order_lines(self):
+    @api.depends('sale_order_ids')
+    def _search_sale_order_lines(self):
         for project in self:
-            if project.sale_order_id:
-                project.sale_order_line_ids = project.sale_order_id.order_line.filtered(
-                    lambda so: so.display_type not in ['line_section', 'line_note'])
-            else:
-                project.sale_order_line_ids = []
-
-    @api.depends('sale_order_id', 'sale_order_id.assessment_index_id')
-    def _compute_assessment_index(self):
-        for project in self:
-            if project.sale_order_id:
-                project.assessment_index_id = project.sale_order_id.assessment_index_id
-            else:
-                project.assessment_index_id = None
+            project.sale_order_line_ids = self.env['sale.order.line']
+            for sale_order in project.sale_order_ids:
+                project.sale_order_line_ids += sale_order.order_line.filtered(
+                    lambda sol: sol.display_type not in ['line_section', 'line_note'])

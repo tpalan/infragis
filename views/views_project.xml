@@ -24,8 +24,15 @@
                     <group>
                         <field name="initial_invoice_id"
                                domain="[('type', '=', 'out_invoice'),('end_customer_id', '=', partner_id),'|',('partner_id', '=', partner_id)]"/>
-                        <field name="sale_order_id" domain="[('partner_id', '=', partner_id)]"/>
-                        <field name="assessment_index_id"/>
+                        <field name="sale_order_ids" domain="[('partner_id', '=', partner_id)]" widget="many2many">
+                            <tree string="Angebote">
+                                <field name="name"/>
+                                <field name="assessment_index_id"/>
+                                <field name="amount_untaxed"/>
+                                <field name="state" optional="show" invisible="1"/>
+                                <field name="currency_id" invisible="1"/>
+                            </tree>
+                        </field>
                     </group>
                     <separator/>
                     <notebook>
@@ -34,8 +41,9 @@
                                 <tree string="Monatliche Gebühren">
                                     <field name="name"/>
                                     <field name="price_unit"/>
+                                    <field name="assessment_index_id"/>
                                     <field name="discount"/>
-                                    <field name="price_subtotal"/>
+                                    <field name="price_subtotal" sum="Total"/>
                                     <field name="currency_id" invisible="1"/>
                                 </tree>
                             </field>
