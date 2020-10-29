@@ -6,6 +6,9 @@
         <field name="priority" eval="16"/>
         <field name="arch" type="xml">
             <form string="Projekt">
+                <header>
+                    <button string="Rechnung generieren" type="object" name="generate_invoice"/>
+                </header>
                 <sheet name="Projekt">
                     <group>
                         <group>
@@ -19,12 +22,15 @@
                             <field name="sale_order_sent_date"/>
                             <field name="sale_order_accepted_date"/>
                             <field name="recurring_invoice_start_date"/>
+                            <field name="recurring_invoice_stop_date"/>
                         </group>
                     </group>
                     <group>
                         <field name="initial_invoice_id"
                                domain="[('type', '=', 'out_invoice'),('end_customer_id', '=', partner_id),'|',('partner_id', '=', partner_id)]"/>
-                        <field name="sale_order_ids" domain="[('partner_id', '=', partner_id)]" widget="many2many">
+                        <field name="sale_order_ids"
+                               domain="[('partner_id', '=', partner_id),('assessment_index_id', '!=',None)]"
+                               widget="many2many">
                             <tree string="Angebote">
                                 <field name="name"/>
                                 <field name="assessment_index_id"/>
@@ -101,5 +107,18 @@
             </search>
         </field>
     </record>
+
+    <!--<record model="ir.actions.server" id="action_infragis_project_gen_invoice">
+        <field name="name">Rechnungen generieren</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_infragis_project"/>
+        <field name="binding_model_id" ref="model_infragis_project"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.generate_invoice()
+        </field>
+    </record> -->
 
 </odoo>

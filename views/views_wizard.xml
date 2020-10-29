@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_infragis_invoice_wizard" model="ir.ui.view">
+        <field name="name">infragis.invoice.wizard.view</field>
+        <field name="model">infragis.invoice.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Quartalsrechnungen erstellen">
+                <group>
+                    <field name="quarter"/>
+                </group>
+                <field name="project_ids">
+                    <tree>
+                        <field name="name"/>
+                        <field name="price_sum_total"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button name="action_generate_invoices" type="object" string="Erstellen" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Rechnungen erstellen"
+                id="action_infragis_launch_invoice_wizard"
+                binding_model="infragis.project"
+                res_model="infragis.invoice.wizard"
+                binding_views="list"
+                view_mode="form"
+                target="new"/>
+</odoo>

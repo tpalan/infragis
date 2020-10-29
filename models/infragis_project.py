@@ -1,6 +1,8 @@
 import datetime
 from pprint import pprint
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields, api
 
 
@@ -19,6 +21,7 @@ class InfragisProject(models.Model):
     initial_invoice_id = fields.Many2one('account.move', string="Rechnung Kauf")
 
     recurring_invoice_start_date = fields.Date(string="Wartungsgebühr ab", tracking=True)
+    recurring_invoice_stop_date = fields.Date(string="Wartungsgebühr bis", tracking=True)
 
     sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
     sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
@@ -27,7 +30,7 @@ class InfragisProject(models.Model):
 
     sale_order_ids = fields.Many2many('sale.order', string="Angebot(e)", tracking=True)
     sale_order_line_ids = fields.Many2many('sale.order.line', string="Gebühren", readonly=True, store=False,
-                                           compute='_search_sale_order_lines')
+                                           compute='_compute_sale_order_lines')
 
     currency_id = fields.Many2one('res.currency', string="Currency",
                                   default=lambda self: self.env.user.company_id.currency_id, store=True, readonly=True)
@@ -78,9 +81,99 @@ class InfragisProject(models.Model):
                 project.price_sum_total += line.price_subtotal / old_index_value * cur_index.value
 
     @api.depends('sale_order_ids')
-    def _search_sale_order_lines(self):
+    def _compute_sale_order_lines(self):
         for project in self:
             project.sale_order_line_ids = self.env['sale.order.line']
             for sale_order in project.sale_order_ids:
                 project.sale_order_line_ids += sale_order.order_line.filtered(
                     lambda sol: sol.display_type not in ['line_section', 'line_note'])
+
+    def generate_invoice(self, quarter=1, year=2021):
+        for project in self:
+
+            # check if we need to bill anything
+            if not(project.recurring_invoice_start_date):
+                print("No start date in project {} ({})".format(project.id, project.name))
+                continue
+            # check if we have at least one month to invoice
+            # the first day to invoice has to be earlier than the first day of the last month of the quarter
+            last_month = (quarter * 3)
+
+            last_month_date = datetime.datetime.now().date().replace(year=year, month=last_month, day=1)
+            # print("first day of last month of quarter: {}".format(last_month_date))
+
+            if project.recurring_invoice_start_date > last_month_date:
+                print("Start date {} in project {} ({}) is later than first day of last month of quarter ({})".format(
+                    project.recurring_invoice_start_date, project.id, project.name, last_month_date))
+                continue
+
+            # check if start date is before first day of quarter
+            quantity = 0
+            first_month = (quarter * 3) - 2
+            first_day_date = datetime.datetime.now().date().replace(year=year, month=first_month, day=1)
+            if project.recurring_invoice_start_date < first_day_date:
+                quantity = 3  # full quarter
+            else:
+                # calculate remaining months
+                quantity = last_month - project.recurring_invoice_start_date.month
+
+            print("after start-date: quantitiy is now {}".format(quantity))
+
+            # check end date
+            if project.recurring_invoice_stop_date:
+                second_month = (quarter * 3) - 1
+                second_month_date = datetime.datetime.now().date().replace(year=year, month=second_month, day=1)
+                if project.recurring_invoice_stop_date < second_month_date:
+                    print(
+                        "Stop date {} in project {} ({}) is earlier than first day of the second month of the quarter ({})".format(
+                            project.recurring_invoice_stop_date, project.id, project.name, second_month_date))
+                    continue
+                # calculate number of months to bill
+                last_day = datetime.datetime.now().date().replace(year=year, month=last_month, day=1) + relativedelta(
+                    months=1) + relativedelta(days=-1)
+                if project.recurring_invoice_stop_date <= last_day:
+                    # reduce quantity
+                    quantity -= (last_month - project.recurring_invoice_stop_date.month)+1
+            print("after stop-date: quantitiy is now {}".format(quantity))
+
+            if quantity <= 0:
+                print("Nothing to bill in project {} ({})", project.id, project.name)
+                continue
+
+            # format Leistungszeitraum, e.g. "Q1 2020"
+            period = 'Q{} {}'.format(quarter, year)
+            invoice_origin = 'IGIS{}'.format(project.id)
+
+            invoice_vals = None
+            create = True
+
+            for sale_order in project.sale_order_ids:
+                if invoice_vals == None:
+
+                    # look if we already have an invoice with this period & partner_id & project
+                    if len(self.env['account.move'].search(
+                            [('period', '=', period), ('partner_id', '=', project.partner_id.id),
+                             ('invoice_origin', '=', invoice_origin)])) > 0:
+                        print("Invoice for period {} already exists in project {} ({})".format(period, project.id, project.name))
+                        create = False
+                        break
+                    invoice_vals = sale_order._prepare_invoice()
+                # add all invoice lines
+                for sale_order_line in sale_order.order_line.filtered(
+                        lambda sol: sol.display_type not in ['line_section', 'line_note']):
+                    invoice_line_vals = sale_order_line._prepare_invoice_line_wqty(year, quantity)
+                    invoice_vals['invoice_line_ids'].append((0, None, invoice_line_vals))
+
+            if create:
+                invoice_vals['period'] = period
+                invoice_vals['invoice_origin'] = invoice_origin
+                invoice_vals['end_customer_id'] = project.partner_id
+                invoice_vals['commission_partner_id'] = project.commission_partner_id
+
+                # save igis project id
+                #invoice_vals['igis_project_id'] = project
+
+                # pprint(invoice_vals)
+
+                # create invoice draft
+                invoice = self.env['account.move'].create(invoice_vals)
