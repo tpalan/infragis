@@ -13,7 +13,7 @@ class InfragisProject(models.Model):
     _order = 'sale_order_accepted_date desc, id desc'
     _mail_post_access = 'read'
 
-    name = fields.Char('Bezeichnung', compute='_compute_name', store=True)
+    name = fields.Char('Bezeichnung', compute='_compute_name')
 
     partner_id = fields.Many2one('res.partner', string="Kunde", required=True)
 
@@ -26,15 +26,15 @@ class InfragisProject(models.Model):
     sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
     sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
 
-    commission_partner_id = fields.Many2one('res.partner', string="Provisions-Empfänger")
+    commission_partner_id = fields.Many2one('res.partner', string="Provision an")
 
-    sale_order_ids = fields.Many2many('sale.order', string="Angebot(e)", tracking=True)
+    sale_order_ids = fields.One2many('sale.order', 'igis_project_id', string="Angebot(e)", tracking=True)
     sale_order_line_ids = fields.Many2many('sale.order.line', string="Gebühren", readonly=True, store=False,
                                            compute='_compute_sale_order_lines')
 
     currency_id = fields.Many2one('res.currency', string="Currency",
                                   default=lambda self: self.env.user.company_id.currency_id, store=True, readonly=True)
-    price_sum_total = fields.Monetary(string="Aktuelle Monatsrate", readonly=True, store=True,
+    price_sum_total = fields.Monetary(string="Monatsrate", readonly=True, store=True,
                                       compute='_compute_price_sum',
                                       currency_field='currency_id', tracking=True)
 
@@ -57,7 +57,7 @@ class InfragisProject(models.Model):
     @api.depends('partner_id')
     def _compute_name(self):
         for project in self:
-            project.name = project.partner_id.name
+            project.name = '{} ({})'.format(project.partner_id.name,project.id)
 
     @api.depends('partner_id')
     def _compute_invoices(self):
@@ -89,8 +89,12 @@ class InfragisProject(models.Model):
                     lambda sol: sol.display_type not in ['line_section', 'line_note'])
 
     def generate_invoice(self, quarter=1, year=2021):
-        for project in self:
 
+        # format Leistungszeitraum, e.g. "Q1 2020"
+        period = 'Q{} {}'.format(quarter, year)
+        invoice_ids = []
+
+        for project in self:
             # check if we need to bill anything
             if not(project.recurring_invoice_start_date):
                 print("No start date in project {} ({})".format(project.id, project.name))
@@ -140,8 +144,6 @@ class InfragisProject(models.Model):
                 print("Nothing to bill in project {} ({})", project.id, project.name)
                 continue
 
-            # format Leistungszeitraum, e.g. "Q1 2020"
-            period = 'Q{} {}'.format(quarter, year)
             invoice_origin = 'IGIS{}'.format(project.id)
 
             invoice_vals = None
@@ -170,10 +172,24 @@ class InfragisProject(models.Model):
                 invoice_vals['end_customer_id'] = project.partner_id
                 invoice_vals['commission_partner_id'] = project.commission_partner_id
 
-                # save igis project id
-                #invoice_vals['igis_project_id'] = project
-
-                # pprint(invoice_vals)
-
                 # create invoice draft
                 invoice = self.env['account.move'].create(invoice_vals)
+                invoice_ids.append(invoice.id)
+
+        # open the invoice list with a filter set
+        action_vals = {
+            'name': 'Rechnungen {}'.format(period),
+            'domain': [('id', 'in', invoice_ids)],
+            'res_model': 'account.move',
+            'views': [[False, "tree"], [False, "form"]],
+            'type': 'ir.actions.act_window',
+            'context': self._context
+        }
+
+        if len(invoice_ids) == 1:
+            # why does this not work?
+            action_vals.update({'res_id': invoice_ids[0], 'view_mode': 'form'})
+        else:
+            action_vals['view_mode'] = 'tree,form'
+
+        return action_vals

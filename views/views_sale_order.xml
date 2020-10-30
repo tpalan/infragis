@@ -5,6 +5,10 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="igis_project_id" attrs="{'invisible':[('igis_project_id', '==', False)]}"/>
+                <button name="generate_project" string="Projekt erstellen" type="object" class="oe_highlight" attrs="{'invisible':[('igis_project_id', '!=', False)]}"/>
+            </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="assessment_index_id"/>
             </xpath>

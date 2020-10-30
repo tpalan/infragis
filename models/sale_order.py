@@ -6,7 +6,33 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     assessment_index_id = fields.Many2one('assessment.index', string="Berechnungsgrundlage")
+    igis_project_id = fields.Many2one('infragis.project', string="IGIS Projekt", readonly=True, tracking=True)
 
+    def generate_project(self):
+
+        self.ensure_one()
+
+        # generate a new project
+        project_vals = {
+            'partner_id': self.partner_id.id,
+            'sale_order_ids': [self.id]
+        }
+
+        #project = self.env['infragis.project'].create(project_vals)
+
+        # open the project in edit mode
+        return {
+            'name': 'Projekt anlegen',
+            'view_mode': 'tree,form',
+            'views': [(False, 'form')],
+            'res_model': 'infragis.project',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                'default_partner_id': self.partner_id.id,
+                'default_sale_order_ids': [self.id]
+            }
+        }
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -34,7 +60,7 @@ class SaleOrderLine(models.Model):
             'name': self.name,
             'product_id': self.product_id.id,
             'product_uom_id': self.product_uom.id,
-            'quantity': 3,
+            'quantity': qty,
             'discount': self.discount,
             'price_unit': price_unit,
             'tax_ids': [(6, 0, self.tax_id.ids)],
