@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="infragis.invoice_document" inherit_id="account.report_invoice_document">
+        <!-- remove source/origin field in invoice and replace with Leistungszeitraum
+        TODO: howto use "Benefit period" name and translate?
+        -->
+        <xpath expr="//div[@id='informations']/div[@name='origin']" position="replace">
+            <div class="col-auto mw-100 mb-2" t-if="o.period" name="period">
+                <strong>Leistungszeitraum:</strong>
+                <p class="m-0" t-field="o.period"/>
+            </div>
+        </xpath>
+
+        <!-- remove due date -->
+        <xpath expr="//div[@id='informations']/div[@name='due_date']" position="replace"/>
+    </template>
+</odoo>

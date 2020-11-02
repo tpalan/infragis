@@ -19,6 +19,7 @@
         'views/views_project.xml',
         'views/views_sale_order.xml',
         'views/views_menu.xml',
-        'views/views_wizard.xml'
+        'views/views_wizard.xml',
+        'views/report_templates.xml'
     ],
 }
