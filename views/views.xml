@@ -27,9 +27,9 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_account_invoice_filter"/>
         <field name="arch" type="xml">
-            <!--<xpath expr="/search/group/filter[@name='group_by_partner_id']" position="after">
+            <xpath expr="/search/group/filter[@name='invoicedate']" position="after">
                 <filter name="group_by_end_customer_id" string="Endkunde" context="{'group_by':'end_customer_id'}"/>
-            </xpath> -->
+            </xpath>
             <xpath expr="/search/field[@name='partner_id']" position="after">
                 <field name="end_customer_id" operator="child_of"/>
             </xpath>
