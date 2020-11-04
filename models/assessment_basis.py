@@ -4,6 +4,7 @@ from odoo import models, fields
 class AssessmentIndex(models.Model):
     _name = 'assessment.index'
     _description = 'Index'
+    _order = 'name desc'
 
     name = fields.Integer('Jahr', required=True)  # TODO: format without thousand seperator
     currency_id = fields.Many2one('res.currency', string="Currency",

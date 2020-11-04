@@ -10,10 +10,10 @@ class InfragisProject(models.Model):
     _name = 'infragis.project'
     _description = 'IGIS Projekt'
     _inherit = ['mail.thread']
-    _order = 'sale_order_accepted_date desc, id desc'
+    _order = 'name, sale_order_accepted_date desc'
     _mail_post_access = 'read'
 
-    name = fields.Char('Bezeichnung', compute='_compute_name')
+    name = fields.Char('Bezeichnung', compute='_compute_name', store=True)
 
     partner_id = fields.Many2one('res.partner', string="Kunde", required=True)
 
@@ -25,6 +25,7 @@ class InfragisProject(models.Model):
 
     sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
     sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
+    #sale_order_attachment = fields.Many2many('ir.attachment', string="Angebots-Dokument")
 
     commission_partner_id = fields.Many2one('res.partner', string="Provision an")
 

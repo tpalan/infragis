@@ -11,7 +11,8 @@ class InfragisWizard(models.TransientModel):
 
     project_ids = fields.Many2many('infragis.project', string="Projekte")
 
-    quarter = fields.Selection(selection=lambda self: self._compute_quarter_list(), required=True)
+    quarter = fields.Selection(selection=lambda self: self._compute_quarter_list(), required=True,
+                               string="Generieren bis inkl. Quartal")
 
     @api.model
     def _compute_quarter_list(self):
@@ -30,8 +31,8 @@ class InfragisWizard(models.TransientModel):
             ('{}|{}'.format(last_quarter, last_quarter_date.year),
              'Q{} {}'.format(last_quarter, last_quarter_date.year)),
             ('{}|{}'.format(cur_quarter, cur_date.year), 'Q{} {}'.format(cur_quarter, cur_date.year)),
-            (
-            '{}|{}'.format(next_quarter, next_quarter_date.year), 'Q{} {}'.format(next_quarter, next_quarter_date.year))
+            ('{}|{}'.format(next_quarter, next_quarter_date.year),
+             'Q{} {}'.format(next_quarter, next_quarter_date.year))
         ]
 
         return select
@@ -51,4 +52,14 @@ class InfragisWizard(models.TransientModel):
         print(quarter_sel)
         [quarter, year] = [int(s) for s in quarter_sel.split('|')]
 
-        return self.project_ids.generate_invoice(quarter, year)
+        project_ids = []
+        # start 3 years ago
+        year -= 3
+        for x in range(12):
+            quarter += 1
+            if quarter >= 5:
+                year += 1
+                quarter = 1
+            print("Generating for Q{}/{}".format(quarter, year))
+            project_ids.append(self.project_ids.generate_invoice(quarter, year))
+        return project_ids

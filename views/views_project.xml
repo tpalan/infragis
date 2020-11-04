@@ -20,6 +20,11 @@
                         </group>
                         <group>
                             <field name="sale_order_sent_date"/>
+                            <!--<field name="sale_order_attachment" domain="[('res_model', '=','infragis.project')]" widget="many2many">
+                                <tree string="Angebots-Dokumente">
+                                    <field name="display_name"/>
+                                </tree>
+                            </field> -->
                             <field name="sale_order_accepted_date"/>
                             <field name="recurring_invoice_start_date"/>
                             <field name="recurring_invoice_stop_date"/>
@@ -27,7 +32,7 @@
                     </group>
                     <group>
                         <field name="initial_invoice_id"
-                               domain="[('type', '=', 'out_invoice'),('end_customer_id', '=', partner_id),'|',('partner_id', '=', partner_id)]"/>
+                               domain="[('type', '=', 'out_invoice'),('end_customer_id', '=', partner_id)]"/>
                         <field name="sale_order_ids"
                                domain="[('partner_id', '=', partner_id),('assessment_index_id', '!=',None)]"
                                widget="many2many">
