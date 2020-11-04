@@ -52,7 +52,7 @@ class InfragisWizard(models.TransientModel):
         print(quarter_sel)
         [quarter, year] = [int(s) for s in quarter_sel.split('|')]
 
-        project_ids = []
+        invoice_ids = []
         # start 3 years ago
         year -= 3
         for x in range(12):
@@ -61,5 +61,22 @@ class InfragisWizard(models.TransientModel):
                 year += 1
                 quarter = 1
             print("Generating for Q{}/{}".format(quarter, year))
-            project_ids.append(self.project_ids.generate_invoice(quarter, year))
-        return project_ids
+            invoice_ids.extend(self.project_ids.generate_invoice(quarter, year))
+
+        # open the invoice list with a filter set
+        action_vals = {
+            'name': 'Rechnungen bis Q{}/{}'.format(quarter,year),
+            'domain': [('id', 'in', invoice_ids)],
+            'res_model': 'account.move',
+            'views': [[False, "tree"], [False, "form"]],
+            'type': 'ir.actions.act_window',
+            'context': self._context
+        }
+
+        if len(invoice_ids) == 1:
+            # why does this not work?
+            action_vals.update({'res_id': invoice_ids[0], 'view_mode': 'form'})
+        else:
+            action_vals['view_mode'] = 'tree,form'
+
+        return action_vals

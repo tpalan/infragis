@@ -177,20 +177,5 @@ class InfragisProject(models.Model):
                 invoice = self.env['account.move'].create(invoice_vals)
                 invoice_ids.append(invoice.id)
 
-        # open the invoice list with a filter set
-        action_vals = {
-            'name': 'Rechnungen {}'.format(period),
-            'domain': [('id', 'in', invoice_ids)],
-            'res_model': 'account.move',
-            'views': [[False, "tree"], [False, "form"]],
-            'type': 'ir.actions.act_window',
-            'context': self._context
-        }
+        return invoice_ids
 
-        if len(invoice_ids) == 1:
-            # why does this not work?
-            action_vals.update({'res_id': invoice_ids[0], 'view_mode': 'form'})
-        else:
-            action_vals['view_mode'] = 'tree,form'
-
-        return action_vals
