@@ -35,4 +35,26 @@
             </xpath>
         </field>
     </record>
+
+    <!-- add import button for product variants -->
+    <record id="action_import_product_template_attribute_value" model="ir.actions.client">
+        <field name="name">Import</field>
+        <field name="tag">import</field>
+        <field name="params">{ 'model': 'product.template.attribute.value' }</field>
+    </record>
+
+    <!-- enable export and add import button. this is suboptimal as a button is added to every row -->
+    <record id="view_infragis_product_template_attribute_value" model="ir.ui.view">
+        <field name="name">product.template.attribute.value.tree.igis</field>
+        <field name="model">product.template.attribute.value</field>
+        <field name="inherit_id" ref="product.product_template_attribute_value_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="export_xlsx">true</attribute>
+            </xpath>
+            <xpath expr="//tree" position="inside">
+                <button name="%(action_import_product_template_attribute_value)d" string="Import" type="action"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

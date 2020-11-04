@@ -10,7 +10,7 @@
     'website': "http://www.palan.at",
     'category': 'Uncategorized',
     'version': '0.1',
-    'depends': ['base', 'p3base', 'sale_management'],
+    'depends': ['base', 'p3base', 'sale_management', 'product'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
