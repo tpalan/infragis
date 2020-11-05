@@ -13,7 +13,7 @@ class InfragisProject(models.Model):
     _order = 'name, sale_order_accepted_date desc'
     _mail_post_access = 'read'
 
-    name = fields.Char('Bezeichnung', compute='_compute_name', store=True)
+    name = fields.Char('Bezeichnung')
 
     partner_id = fields.Many2one('res.partner', string="Kunde", required=True)
 
@@ -55,10 +55,12 @@ class InfragisProject(models.Model):
         for index in self:
             index.currency_id = self._context.get('default_currency_id')
 
-    @api.depends('partner_id')
-    def _compute_name(self):
+
+    @api.onchange('partner_id')
+    def _change_partner_id(self):
         for project in self:
-            project.name = '{} ({})'.format(project.partner_id.name,project.id)
+            if project.name is False:
+                project.name = project.partner_id.name
 
     @api.depends('partner_id')
     def _compute_invoices(self):

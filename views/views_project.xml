@@ -12,6 +12,7 @@
                 <sheet name="Projekt">
                     <group>
                         <group>
+                            <field name="name"/>
                             <field name="partner_id"/>
                             <field name="introduction_date"/>
                             <field name="price_sum_total"/>
@@ -89,7 +90,9 @@
         <field name="model">infragis.project</field>
         <field name="arch" type="xml">
             <tree string="Projekte">
+                <field name="name"/>
                 <field name="partner_id"/>
+                <field name="recurring_invoice_start_date"/>
                 <field name="sale_order_accepted_date"/>
                 <field name="introduction_date"/>
                 <field name="price_sum_total" sum="Total"/>
