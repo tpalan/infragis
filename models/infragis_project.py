@@ -118,7 +118,7 @@ class InfragisProject(models.Model):
             quantity = 0
             first_month = (quarter * 3) - 2
             first_day_date = datetime.datetime.now().date().replace(year=year, month=first_month, day=1)
-            if project.recurring_invoice_start_date < first_day_date:
+            if project.recurring_invoice_start_date <= first_day_date:
                 quantity = 3  # full quarter
             else:
                 # calculate remaining months
