@@ -77,6 +77,7 @@
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
             </form>
@@ -110,6 +111,22 @@
                             context="{'group_by':'commission_partner_id'}"/>
                 </group>
             </search>
+        </field>
+    </record>
+
+    <record id="infragis_project_view_activity" model="ir.ui.view">
+        <field name="name">infragis.project.activity</field>
+        <field name="model">infragis.project</field>
+        <field name="arch" type="xml">
+            <activity string="IGIS Projekt">
+                <templates>
+                    <div t-name="activity-box">
+                        <div>
+                            <field name="name" display="full"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
         </field>
     </record>
 </odoo>

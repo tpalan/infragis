@@ -9,7 +9,7 @@ from odoo import models, fields, api
 class InfragisProject(models.Model):
     _name = 'infragis.project'
     _description = 'IGIS Projekt'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name, sale_order_accepted_date desc'
     _mail_post_access = 'read'
 
