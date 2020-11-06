@@ -31,9 +31,16 @@
                             <field name="recurring_invoice_stop_date"/>
                         </group>
                     </group>
-                    <group>
+                    <separator/>
+                    <group col="4">
                         <field name="initial_invoice_id"
                                domain="[('type', '=', 'out_invoice'),('end_customer_id', '=', partner_id)]"/>
+                        <field name="initial_invoice_date"/>
+                        <field name="initial_invoice_period"/>
+                        <field name="initial_invoice_amount"/>
+                    </group>
+                    <separator/>
+                    <group>
                         <field name="sale_order_ids"
                                domain="[('partner_id', '=', partner_id),('assessment_index_id', '!=',None)]"
                                widget="many2many">
