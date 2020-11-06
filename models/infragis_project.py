@@ -22,7 +22,7 @@ class InfragisProject(models.Model):
     initial_invoice_id = fields.Many2one('account.move', string="Rechnung Kauf")
     initial_invoice_date = fields.Date('Datum', related='initial_invoice_id.invoice_date')
     initial_invoice_period = fields.Char('Zeitraum', related='initial_invoice_id.period')
-    initial_invoice_amount = fields.Monetary('netto', related='initial_invoice_id.amount_untaxed')
+    initial_invoice_amount = fields.Monetary('Kauf netto', related='initial_invoice_id.amount_untaxed')
 
     recurring_invoice_start_date = fields.Date(string="Wartungsgebühr ab", tracking=True)
     recurring_invoice_stop_date = fields.Date(string="Wartungsgebühr bis", tracking=True)
