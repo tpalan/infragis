@@ -4,6 +4,7 @@ from pprint import pprint
 from dateutil.relativedelta import relativedelta
 
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class InfragisProject(models.Model):
@@ -29,7 +30,7 @@ class InfragisProject(models.Model):
 
     sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
     sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
-    #sale_order_attachment = fields.Many2many('ir.attachment', string="Angebots-Dokument")
+    # sale_order_attachment = fields.Many2many('ir.attachment', string="Angebots-Dokument")
 
     commission_partner_id = fields.Many2one('res.partner', string="Provision an")
 
@@ -58,7 +59,6 @@ class InfragisProject(models.Model):
     def _get_default_currency(self):
         for index in self:
             index.currency_id = self._context.get('default_currency_id')
-
 
     @api.onchange('partner_id')
     def _change_partner_id(self):
@@ -95,7 +95,12 @@ class InfragisProject(models.Model):
                 project.sale_order_line_ids += sale_order.order_line.filtered(
                     lambda sol: sol.display_type not in ['line_section', 'line_note'])
 
-    def generate_invoice(self, quarter=1, year=2021):
+    def generate_invoice(self, quarter=0, year=0):
+
+        if quarter == 0:
+            quarter = (datetime.datetime.now().date().month // 3) + 1
+        if year == 0:
+            year = datetime.datetime.now().date().year
 
         # format Leistungszeitraum, e.g. "Q1 2020"
         period = 'Q{} {}'.format(quarter, year)
@@ -103,9 +108,11 @@ class InfragisProject(models.Model):
 
         for project in self:
             # check if we need to bill anything
-            if not(project.recurring_invoice_start_date):
+            if not (project.recurring_invoice_start_date):
                 print("No start date in project {} ({})".format(project.id, project.name))
                 continue
+            if not (project.sale_order_sent_date):
+                raise UserError(('Keine Angebotsdatum für Projekt {}'.format(project.name)))
             # check if we have at least one month to invoice
             # the first day to invoice has to be earlier than the first day of the last month of the quarter
             last_month = (quarter * 3)
@@ -144,7 +151,7 @@ class InfragisProject(models.Model):
                     months=1) + relativedelta(days=-1)
                 if project.recurring_invoice_stop_date <= last_day:
                     # reduce quantity
-                    quantity -= (last_month - project.recurring_invoice_stop_date.month)+1
+                    quantity -= (last_month - project.recurring_invoice_stop_date.month) + 1
             print("after stop-date: quantitiy is now {}".format(quantity))
 
             if quantity <= 0:
@@ -163,13 +170,24 @@ class InfragisProject(models.Model):
                     if len(self.env['account.move'].search(
                             [('period', '=', period), ('partner_id', '=', project.partner_id.id),
                              ('invoice_origin', '=', invoice_origin)])) > 0:
-                        print("Invoice for period {} already exists in project {} ({})".format(period, project.id, project.name))
+                        print("Invoice for period {} already exists in project {} ({})".format(period, project.id,
+                                                                                               project.name))
                         create = False
                         break
                     invoice_vals = sale_order._prepare_invoice()
-                # add all invoice lines
+
+                # add all lines from sale_order as invoice_lines
+                # add a section with the sale_order_sent_date before
+                first = True
                 for sale_order_line in sale_order.order_line.filtered(
                         lambda sol: sol.display_type not in ['line_section', 'line_note']):
+                    # create section
+                    if first == True:
+                        #formatted_date = datetime.datetime.strptime(project.sale_order_sent_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                        formatted_date = project.sale_order_sent_date.strftime('%d.%m.%Y')
+                        section_name = 'InfraGIS Wartungsgebühr lt. Angebot vom {}'.format(formatted_date)
+                        invoice_vals['invoice_line_ids'].append((0, None, sale_order_line._prepare_invoice_line_section(section_name)))
+                        first = False
                     invoice_line_vals = sale_order_line._prepare_invoice_line_wqty(year, quantity)
                     invoice_vals['invoice_line_ids'].append((0, None, invoice_line_vals))
 
@@ -184,4 +202,3 @@ class InfragisProject(models.Model):
                 invoice_ids.append(invoice.id)
 
         return invoice_ids
-

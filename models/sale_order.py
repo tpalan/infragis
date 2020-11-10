@@ -71,3 +71,23 @@ class SaleOrderLine(models.Model):
         if self.display_type:
             res['account_id'] = False
         return res
+
+    def _prepare_invoice_line_section(self, name):
+        self.ensure_one()
+
+        res = {
+            'display_type': 'line_section',
+            'sequence': self.sequence,
+            'name': name,
+            'product_id': None,
+            'product_uom_id': None,
+            'quantity': 0,
+            'discount': 0,
+            'price_unit': 0,
+            'tax_ids': [(6, 0, self.tax_id.ids)],
+            'analytic_account_id': self.order_id.analytic_account_id.id,
+            'analytic_tag_ids': [(6, 0, self.analytic_tag_ids.ids)],
+            'account_id': False
+        }
+
+        return res
