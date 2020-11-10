@@ -87,13 +87,14 @@ class InfragisProject(models.Model):
                 old_index_value = sale_order.assessment_index_id.value
                 project.price_sum_total += line.price_subtotal / old_index_value * cur_index.value
 
-    @api.depends('sale_order_ids')
+    @api.depends('sale_order_ids', 'sale_order_ids.amount_untaxed')
     def _compute_sale_order_lines(self):
         for project in self:
             project.sale_order_line_ids = self.env['sale.order.line']
             for sale_order in project.sale_order_ids:
                 project.sale_order_line_ids += sale_order.order_line.filtered(
-                    lambda sol: sol.display_type not in ['line_section', 'line_note'])
+                    lambda sol: (sol.display_type not in ['line_section',
+                                                          'line_note'] and sol.product_id.product_tmpl_id.categ_id.id == 4))
 
     def generate_invoice(self, quarter=0, year=0):
 
@@ -111,8 +112,8 @@ class InfragisProject(models.Model):
             if not (project.recurring_invoice_start_date):
                 print("No start date in project {} ({})".format(project.id, project.name))
                 continue
-            if not (project.sale_order_sent_date):
-                raise UserError(('Keine Angebotsdatum für Projekt {}'.format(project.name)))
+            # if not (project.sale_order_sent_date):
+            #    raise UserError(('Keine Angebotsdatum für Projekt {}'.format(project.name)))
             # check if we have at least one month to invoice
             # the first day to invoice has to be earlier than the first day of the last month of the quarter
             last_month = (quarter * 3)
@@ -180,13 +181,14 @@ class InfragisProject(models.Model):
                 # add a section with the sale_order_sent_date before
                 first = True
                 for sale_order_line in sale_order.order_line.filtered(
-                        lambda sol: sol.display_type not in ['line_section', 'line_note']):
+                        lambda sol: (sol.display_type not in ['line_section',
+                                                              'line_note'] and sol.product_id.product_tmpl_id.categ_id.id == 4)):
                     # create section
                     if first == True:
-                        #formatted_date = datetime.datetime.strptime(project.sale_order_sent_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-                        formatted_date = project.sale_order_sent_date.strftime('%d.%m.%Y')
+                        formatted_date = sale_order.date_order.strftime('%d.%m.%Y')
                         section_name = 'InfraGIS Wartungsgebühr lt. Angebot vom {}'.format(formatted_date)
-                        invoice_vals['invoice_line_ids'].append((0, None, sale_order_line._prepare_invoice_line_section(section_name)))
+                        invoice_vals['invoice_line_ids'].append(
+                            (0, None, sale_order_line._prepare_invoice_line_section(section_name)))
                         first = False
                     invoice_line_vals = sale_order_line._prepare_invoice_line_wqty(year, quantity)
                     invoice_vals['invoice_line_ids'].append((0, None, invoice_line_vals))

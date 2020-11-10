@@ -9,16 +9,7 @@ class SaleOrder(models.Model):
     igis_project_id = fields.Many2one('infragis.project', string="IGIS Projekt", readonly=True, tracking=True)
 
     def generate_project(self):
-
         self.ensure_one()
-
-        # generate a new project
-        project_vals = {
-            'partner_id': self.partner_id.id,
-            'sale_order_ids': [self.id]
-        }
-
-        #project = self.env['infragis.project'].create(project_vals)
 
         # open the project in edit mode
         return {
@@ -33,6 +24,7 @@ class SaleOrder(models.Model):
                 'default_sale_order_ids': [self.id]
             }
         }
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

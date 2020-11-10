@@ -17,4 +17,12 @@
             </xpath>
         </field>
     </record>
+
+    <!--
+    <record model="ir.actions.act_window" id="sale_order_infragis_tree">
+        <field name="name">sale.order.igis.quotation</field>
+        <field name="res_model">sale.order</field>
+        <field name="inherit_id" ref="sale.action_quotations"/>
+    </record>
+    -->
 </odoo>
