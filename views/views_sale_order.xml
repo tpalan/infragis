@@ -11,6 +11,7 @@
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="assessment_index_id"/>
+                <field name="igis_date"/>
             </xpath>
             <xpath expr="//group[@name='note_group']/group/field[@name='note']" position="replace">
                 <field name="note" nolabel="1" placeholder="Terms and conditions..." widget="html"/>
@@ -18,11 +19,15 @@
         </field>
     </record>
 
-    <!--
-    <record model="ir.actions.act_window" id="sale_order_infragis_tree">
-        <field name="name">sale.order.igis.quotation</field>
-        <field name="res_model">sale.order</field>
-        <field name="inherit_id" ref="sale.action_quotations"/>
+
+    <record model="ir.ui.view" id="sale_order_infragis_tree">
+        <field name="name">sale.order.igis.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='create_date']" position="replace">
+                <field name="igis_date"/>
+            </xpath>
+        </field>
     </record>
-    -->
 </odoo>

@@ -1,12 +1,16 @@
+import datetime
+
 from odoo import models, fields
 from odoo.exceptions import UserError
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+    _order = 'igis_date desc'
 
     assessment_index_id = fields.Many2one('assessment.index', string="Berechnungsgrundlage")
     igis_project_id = fields.Many2one('infragis.project', string="IGIS Projekt", readonly=True, tracking=True)
+    igis_date = fields.Date(string='Angebotsdatum', required=False, default=datetime.datetime.now())
 
     def generate_project(self):
         self.ensure_one()
