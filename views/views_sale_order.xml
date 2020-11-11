@@ -7,7 +7,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="igis_project_id" attrs="{'invisible':[('igis_project_id', '==', False)]}"/>
-                <button name="generate_project" string="Projekt erstellen" type="object" class="oe_highlight" attrs="{'invisible':[('igis_project_id', '!=', False)]}"/>
+                <button name="generate_project" string="Projekt erstellen" type="object" class="oe_highlight"
+                        attrs="{'invisible':[('igis_project_id', '!=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
                 <field name="assessment_index_id"/>
@@ -30,4 +31,9 @@
             </xpath>
         </field>
     </record>
+
+    <!-- change menuitem of quotations -->
+    <!-- <record id="sale.action_quotations" model="ir.actions.act_window">
+        <field name="context">Bla</field>
+    </record> -->
 </odoo>

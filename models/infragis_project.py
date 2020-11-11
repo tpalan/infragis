@@ -163,8 +163,8 @@ class InfragisProject(models.Model):
             create = True
 
             for sale_order in project.sale_order_ids:
-                if not (sale_order.igis_date):
-                    raise UserError(('Keine Angebotsdatum für Projekt {}'.format(project.name)))
+                #if not (sale_order.igis_date):
+                #    raise UserError(('Keine Angebotsdatum für Projekt {}'.format(project.name)))
                 if invoice_vals == None:
 
                     # look if we already have an invoice with this period & partner_id & project
@@ -185,8 +185,11 @@ class InfragisProject(models.Model):
                                                               'line_note'] and sol.product_id.product_tmpl_id.categ_id.id == 4)):
                     # create section
                     if first == True:
-                        formatted_date = sale_order.igis_date.strftime('%d.%m.%Y')
-                        section_name = 'InfraGIS Wartungsgebühr lt. Angebot vom {}'.format(formatted_date)
+                        if sale_order.igis_date:
+                            formatted_date = sale_order.igis_date.strftime('%d.%m.%Y')
+                            section_name = 'InfraGIS Wartungsgebühr lt. Angebot vom {}'.format(formatted_date)
+                        else:
+                            section_name = 'InfraGIS Wartungsgebühr'
                         invoice_vals['invoice_line_ids'].append(
                             (0, None, sale_order_line._prepare_invoice_line_section(section_name)))
                         first = False
