@@ -9,9 +9,9 @@ from odoo.exceptions import UserError
 
 class InfragisProject(models.Model):
     _name = 'infragis.project'
-    _description = 'IGIS Projekt'
+    _description = 'GIS Projekt'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'name, sale_order_accepted_date desc'
+    _order = 'name'
     _mail_post_access = 'read'
 
     name = fields.Char('Bezeichnung')
@@ -28,8 +28,8 @@ class InfragisProject(models.Model):
     recurring_invoice_start_date = fields.Date(string="Wartungsgebühr ab", tracking=True)
     recurring_invoice_stop_date = fields.Date(string="Wartungsgebühr bis", tracking=True)
 
-    sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
-    sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
+    #sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
+    #sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
     # sale_order_attachment = fields.Many2many('ir.attachment', string="Angebots-Dokument")
 
     commission_partner_id = fields.Many2one('res.partner', string="Provision an")

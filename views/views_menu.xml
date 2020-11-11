@@ -10,7 +10,7 @@
     <record model="ir.actions.act_window" id="action_infragis_project_window">
         <field name="name">Projekte</field>
         <field name="res_model">infragis.project</field>
-        <field name="view_mode">tree,form,activity</field>
+        <field name="view_mode">tree,form,kanban,activity</field>
         <field name="search_view_id" ref="view_infragis_project_filter"/>
     </record>
 
