@@ -7,6 +7,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='journal_id']" position="after">
                 <field name="end_customer_id"/>
+                <field name="igis_project_id"/>
+                <field name="commission_partner_id"/>
             </xpath>
         </field>
     </record>
