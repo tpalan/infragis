@@ -170,7 +170,7 @@ class InfragisProject(models.Model):
                     # look if we already have an invoice with this period & partner_id & project
                     if len(self.env['account.move'].search(
                             [('period', '=', period), ('partner_id', '=', project.partner_id.id),
-                             ('invoice_origin', '=', invoice_origin)])) > 0:
+                             ('igis_project_id', '=', project.id)])) > 0:
                         print("Invoice for period {} already exists in project {} ({})".format(period, project.id,
                                                                                                project.name))
                         create = False
