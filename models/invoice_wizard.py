@@ -65,7 +65,7 @@ class InfragisWizard(models.TransientModel):
 
         # open the invoice list with a filter set
         action_vals = {
-            'name': 'Rechnungen bis Q{}/{}'.format(quarter,year),
+            'name': 'neue Rechnungen bis Q{}/{}'.format(quarter,year),
             'domain': [('id', 'in', invoice_ids)],
             'res_model': 'account.move',
             'views': [[False, "tree"], [False, "form"]],
