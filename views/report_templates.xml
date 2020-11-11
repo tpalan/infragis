@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!--
     <template id="infragis.report_invoice_document" inherit_id="account.report_invoice_document">
-        <!-- add GIS-Partner to invoice -->
         <xpath expr="//div[@name='reference']" position="after">
             <div class="col-auto mw-100 mb-2" t-if="o.commission_partner_id" name="commission_partner">
                 <strong>GIS-Partner:</strong>
                 <p class="m-0" t-field="o.commission_partner_id"/>
             </div>
         </xpath>
-    </template>
+    </template> -->
 </odoo>
