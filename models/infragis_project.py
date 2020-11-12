@@ -127,12 +127,18 @@ class InfragisProject(models.Model):
             # check if start date is before first day of quarter
             quantity = 0
             first_month = (quarter * 3) - 2
+            recurring_invoice_start_date = project.recurring_invoice_start_date
+
+            # fix start of month (if it is first day of the month, use last day of previous month for calculation)
+            if recurring_invoice_start_date.day == 1:
+                recurring_invoice_start_date += relativedelta(days=-1)
+
             first_day_date = datetime.datetime.now().date().replace(year=year, month=first_month, day=1)
-            if project.recurring_invoice_start_date <= first_day_date:
+            if recurring_invoice_start_date <= first_day_date:
                 quantity = 3  # full quarter
             else:
                 # calculate remaining months
-                quantity = last_month - project.recurring_invoice_start_date.month
+                quantity = last_month - recurring_invoice_start_date.month
 
             print("after start-date: quantitiy is now {}".format(quantity))
 
