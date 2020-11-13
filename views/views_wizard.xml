@@ -29,5 +29,7 @@
                 res_model="infragis.invoice.wizard"
                 binding_views="list"
                 view_mode="form"
-                target="new"/>
+                target="new"
+                groups="infragis.infragis_admins"
+    />
 </odoo>

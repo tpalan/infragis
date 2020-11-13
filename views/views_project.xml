@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form string="Projekt">
                 <header>
-                    <button string="Rechnung generieren" type="object" name="generate_invoice"/>
+                    <button string="Rechnung generieren" type="object" groups="infragis.infragis_admins"/>
                 </header>
                 <sheet name="Projekt">
                     <group>
