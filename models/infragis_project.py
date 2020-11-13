@@ -28,8 +28,8 @@ class InfragisProject(models.Model):
     recurring_invoice_start_date = fields.Date(string="Wartungsgebühr ab", tracking=True)
     recurring_invoice_stop_date = fields.Date(string="Wartungsgebühr bis", tracking=True)
 
-    #sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
-    #sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
+    # sale_order_accepted_date = fields.Date(string="Angebot akzeptiert", tracking=True)
+    # sale_order_sent_date = fields.Date(string="Angebot verschickt", tracking=True)
     # sale_order_attachment = fields.Many2many('ir.attachment', string="Angebots-Dokument")
 
     commission_partner_id = fields.Many2one('res.partner', string="Provision an")
@@ -127,6 +127,7 @@ class InfragisProject(models.Model):
             # check if start date is before first day of quarter
             quantity = 0
             first_month = (quarter * 3) - 2
+            start_month = first_month
             recurring_invoice_start_date = project.recurring_invoice_start_date
 
             # fix start of month (if it is first day of the month, use last day of previous month for calculation)
@@ -138,11 +139,13 @@ class InfragisProject(models.Model):
                 quantity = 3  # full quarter
             else:
                 # calculate remaining months
-                quantity = last_month - recurring_invoice_start_date.month
+                quantity = (last_month - recurring_invoice_start_date.month)
+                start_month += (3 - quantity)
 
             print("after start-date: quantitiy is now {}".format(quantity))
 
             # check end date
+            stop_month = (quarter * 3)
             if project.recurring_invoice_stop_date:
                 second_month = (quarter * 3) - 1
                 second_month_date = datetime.datetime.now().date().replace(year=year, month=second_month, day=1)
@@ -157,7 +160,9 @@ class InfragisProject(models.Model):
                 if project.recurring_invoice_stop_date <= last_day:
                     # reduce quantity
                     quantity -= (last_month - project.recurring_invoice_stop_date.month) + 1
+                    stop_month -= (last_month - project.recurring_invoice_stop_date.month) + 1
             print("after stop-date: quantitiy is now {}".format(quantity))
+            print("start: {} stop: {}".format(start_month, stop_month))
 
             if quantity <= 0:
                 print("Nothing to bill in project {} ({})", project.id, project.name)
@@ -169,7 +174,7 @@ class InfragisProject(models.Model):
             create = True
 
             for sale_order in project.sale_order_ids:
-                #if not (sale_order.igis_date):
+                # if not (sale_order.igis_date):
                 #    raise UserError(('Keine Angebotsdatum für Projekt {}'.format(project.name)))
                 if invoice_vals == None:
 
@@ -199,7 +204,8 @@ class InfragisProject(models.Model):
                         invoice_vals['invoice_line_ids'].append(
                             (0, None, sale_order_line._prepare_invoice_line_section(section_name)))
                         first = False
-                    invoice_line_vals = sale_order_line._prepare_invoice_line_wqty(year, quantity)
+                    invoice_line_vals = sale_order_line._prepare_invoice_line_wqty(year, quantity, start_month,
+                                                                                   stop_month)
                     invoice_vals['invoice_line_ids'].append((0, None, invoice_line_vals))
 
             if create:

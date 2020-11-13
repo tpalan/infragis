@@ -37,7 +37,7 @@ class SaleOrderLine(models.Model):
     assessment_index_id = fields.Many2one('assessment.index', related='order_id.assessment_index_id',
                                           string="Berechnungsgrundlage")
 
-    def _prepare_invoice_line_wqty(self, year, qty=3):
+    def _prepare_invoice_line_wqty(self, year, qty, start_month, stop_month):
         self.ensure_one()
 
         # scale price by index
@@ -50,10 +50,15 @@ class SaleOrderLine(models.Model):
         old_index_value = self.assessment_index_id.value
         price_unit = price_unit / old_index_value * cur_index.value
 
+        # format the period line
+        period_line = "\n{:02d}/{} - {:02d}/{}".format(start_month, year, stop_month, year)
+        if stop_month == start_month:
+            period_line = "\n{:02d}/{}".format(start_month, year)
+
         res = {
             'display_type': self.display_type,
             'sequence': self.sequence,
-            'name': self.name,
+            'name': self.name + period_line,
             'product_id': self.product_id.id,
             'product_uom_id': self.product_uom.id,
             'quantity': qty,
