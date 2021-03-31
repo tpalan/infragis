@@ -19,13 +19,15 @@ class InfragisWizard(models.TransientModel):
         # get current date and get the quarter before and the next one
         cur_date = datetime.datetime.now().date()
         cur_month = cur_date.month
-        cur_quarter = (cur_month // 3) + 1
+        if (cur_month % 3) > 0:
+            cur_month = cur_month - (cur_month % 3) + 3
+        cur_quarter = (cur_month // 3)
 
         last_quarter_date = cur_date + relativedelta(months=-3)
-        last_quarter = (last_quarter_date.month // 3) + 1
+        last_quarter = (last_quarter_date.month // 3)
 
         next_quarter_date = cur_date + relativedelta(months=+3)
-        next_quarter = (next_quarter_date.month // 3) + 1
+        next_quarter = (next_quarter_date.month // 3)
 
         select = [
             ('{}|{}'.format(last_quarter, last_quarter_date.year),
