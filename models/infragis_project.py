@@ -73,7 +73,7 @@ class InfragisProject(models.Model):
                 [('type', '=', 'out_invoice'), '|', ('end_customer_id', '=', project.partner_id.id),
                  ('partner_id', '=', project.partner_id.id)])
 
-    @api.depends('sale_order_line_ids', 'year')
+    @api.depends('sale_order_line_ids', 'year', 'sale_order_ids.assessment_index_id')
     def _compute_price_sum(self):
         # get index for current year
         # get current year

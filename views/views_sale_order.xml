@@ -18,7 +18,6 @@
         </field>
     </record>
 
-
     <record model="ir.ui.view" id="sale_order_infragis_tree">
         <field name="name">sale.order.igis.tree</field>
         <field name="model">sale.order</field>
@@ -29,12 +28,6 @@
             </xpath>
         </field>
     </record>
-
-    <!-- change menuitem of quotations -->
-    <!--
-    <record id="sale.action_quotations" model="ir.actions.act_window">
-        <field name="context"></field>
-    </record> -->
 
     <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
         <field name="context"></field>
