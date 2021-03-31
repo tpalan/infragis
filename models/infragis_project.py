@@ -211,8 +211,8 @@ class InfragisProject(models.Model):
             if create:
                 invoice_vals['period'] = period
                 invoice_vals['invoice_origin'] = invoice_origin
-                invoice_vals['end_customer_id'] = project.partner_id
-                invoice_vals['igis_project_id'] = project
+                invoice_vals['end_customer_id'] = project.partner_id.id
+                invoice_vals['igis_project_id'] = project.id
 
                 # create invoice draft
                 invoice = self.env['account.move'].create(invoice_vals)
